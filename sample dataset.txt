@@ -1,0 +1,139 @@
+# Without target variable and multiple items in a field
+
+fruits <- c("Apple", "Banana", "Orange", "Mango", "Pineapple", "Grapes", "Strawberry", "Kiwi", "Pear", "Cherry")
+
+
+num_records <- 10000 
+
+set.seed(42)  # Set seed for reproducibility
+transactions <- lapply(1:num_records, function(i) {
+  num_items <- sample(1:5, 1)  # Allowing 1 to 5 items per transaction
+  items <- sample(fruits, num_items, replace = TRUE)
+  data.frame(
+    Item = items,
+    ItemPrice = runif(num_items, min = 1, max = 20), 
+    CustID = i 
+  )
+})
+
+data <- do.call(rbind, transactions)
+
+head(data)
+
+write.csv(data, "sales_data_multiple_items.csv", row.names = FALSE)
+
+--------------------------------------------------------------------------
+
+# With target variable
+
+play_tennis <- data.frame(
+  Outlook = c("Sunny", "Sunny", "Overcast", "Rainy", "Rainy", "Rainy", "Overcast", "Sunny", "Sunny", "Rainy", "Sunny", "Overcast", "Overcast", "Rainy"),
+  Temperature = c("Hot", "Hot", "Hot", "Mild", "Cool", "Cool", "Cool", "Mild", "Cool", "Mild", "Mild", "Mild", "Hot", "Mild"),
+  Humidity = c("High", "High", "High", "High", "Normal", "Normal", "Normal", "High", "Normal", "Normal", "Normal", "High", "Normal", "High"),
+  Wind = c("Weak", "Strong", "Weak", "Weak", "Weak", "Strong", "Strong", "Weak", "Weak", "Weak", "Strong", "Strong", "Weak", "Strong"),
+  PlayTennis = c("No", "No", "Yes", "Yes", "Yes", "No", "Yes", "No", "Yes", "Yes", "Yes", "Yes", "Yes", "No")
+)
+
+print(play_tennis)
+
+--------------------------------------------------------------------------
+
+# Bigger version of a dataset with a target variable
+
+num_records <- 1000 
+
+outlook <- c(rep("Sunny", num_records/4), rep("Overcast", num_records/4), rep("Rainy", num_records/4))
+temperature <- sample(c("Hot", "Mild", "Cool"), num_records, replace = TRUE)
+humidity <- sample(c("High", "Normal"), num_records, replace = TRUE)
+wind <- sample(c("Weak", "Strong"), num_records, replace = TRUE)
+play_tennis <- sample(c("Yes", "No"), num_records, replace = TRUE)
+
+play_tennis_large <- data.frame(
+  Outlook = sample(outlook, num_records, replace = TRUE),
+  Temperature = sample(temperature, num_records, replace = TRUE),
+  Humidity = sample(humidity, num_records, replace = TRUE),
+  Wind = sample(wind, num_records, replace = TRUE),
+  PlayTennis = sample(play_tennis, num_records, replace = TRUE)
+)
+
+head(play_tennis_large)
+
+print(paste("Total number of records: ", nrow(play_tennis_large)))
+
+---------------------------------------------------------------------------
+# Apriori
+
+fruits <- c("Apple", "Banana", "Orange", "Mango", "Pineapple", "Grapes", "Strawberry", "Kiwi", "Pear", "Cherry")
+
+num_transactions <- 1000  
+
+set.seed(42)  
+transactions <- lapply(1:num_transactions, function(i) {
+  num_items <- sample(1:5, 1)  # Number of fruits in each transaction (1 to 5 fruits)
+  items <- sample(fruits, num_items, replace = TRUE)
+  items <- sort(items)  # Sort items for consistency
+  items
+})
+
+transactions <- as(transactions, "transactions")
+
+inspect(transactions[1:5])
+
+transactions_df <- as.data.frame(as(transactions, "matrix"))
+
+write.csv(transactions_df, "fruit_transactions.csv", row.names = FALSE)
+
+transactions_df <- read.csv("fruit_transactions.csv", stringsAsFactors = FALSE)
+
+# Convert the data frame back to transactions
+transactions <- as(transactions_df, "transactions")
+
+inspect(transactions[1:5])
+
+------------------------------------------------------------------------
+
+# Random forest
+set.seed(200) 
+
+num_observations <- 1000
+
+predictor1 <- rnorm(num_observations, mean = 50, sd = 10)
+predictor2 <- rnorm(num_observations, mean = 30, sd = 5)
+predictor3 <- rnorm(num_observations, mean = 70, sd = 15)
+
+target <- ifelse(predictor1 + predictor2 + predictor3 > 150, 1, 0)
+
+data <- data.frame(
+  Predictor1 = predictor1,
+  Predictor2 = predictor2,
+  Predictor3 = predictor3,
+  Target = target
+)
+
+write.csv(data, "sample_data.csv", row.names = FALSE)
+data <- read.csv("sample_data.csv")
+
+head(data)
+
+-------------------------------------------------------------------------
+# Clustering
+
+set.seed(42)
+
+num_points <- 200
+
+feature1 <- c(rnorm(num_points, mean = 10, sd = 2), rnorm(num_points, mean = 20, sd = 2))
+feature2 <- c(rnorm(num_points, mean = 30, sd = 2), rnorm(num_points, mean = 15, sd = 2))
+feature3 <- c(rnorm(num_points, mean = 5, sd = 1.5), rnorm(num_points, mean = 25, sd = 1.5))
+feature4 <- c(rnorm(num_points, mean = 18, sd = 3), rnorm(num_points, mean = 10, sd = 3))
+
+target <- sample(c("Y", "N"), num_points * 2, replace = TRUE)
+
+data <- data.frame(Feature1 = feature1, Feature2 = feature2, Feature3 = feature3, Feature4 = feature4, Target=target)
+
+head(data)
+
+write.csv(data, "data.csv", row.names = FALSE)
+data <- read.csv("data.csv")
+
+head(data)
